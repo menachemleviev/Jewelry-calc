@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="עלות תכשיט">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#f5f3ee">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<title>מחשבון עלות תכשיט</title>
+
+<style>
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+[hidden]{display:none!important}
+/* Layout: single column work-sheet, cost lines grouped by stage, summary card under the profit field */
+:root{
+  --bg:#f5f3ee; --surface:#ffffff; --fg:#23211c; --muted:#77705f; --line:#e3ddcf;
+  --gold:#94721f; --gold-soft:#f1e7cc; --good:#2f6b46;
+  --display:"Times New Roman",Georgia,serif;
+  --body:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#17160f; --surface:#211f17; --fg:#efe9da; --muted:#a69d86; --line:#36322a;
+  --gold:#d8b45a; --gold-soft:#3a3120; --good:#7cc596; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#17160f; --surface:#211f17; --fg:#efe9da; --muted:#a69d86; --line:#36322a;
+  --gold:#d8b45a; --gold-soft:#3a3120; --good:#7cc596; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.45;-webkit-text-size-adjust:100%}
+.wrap{max-width:520px;margin:0 auto;padding-inline:16px;padding-block:18px 40px;display:flex;flex-direction:column;gap:18px}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+h1{font-family:var(--display);font-weight:400;font-size:1.65rem;margin:0;line-height:1.1;text-wrap:balance}
+h1 small{display:block;font-family:var(--body);font-size:.85rem;color:var(--muted);font-weight:400;margin-top:4px}
+.links{display:flex;gap:8px}
+.ghost{background:none;border:1px solid var(--line);color:var(--muted);font:600 .85rem var(--body);padding:7px 11px;border-radius:999px;cursor:pointer}
+.ghost:active{background:var(--gold-soft)}
+
+section{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px 14px}
+section h2{font-size:.78rem;letter-spacing:.06em;color:var(--gold);margin:12px 0 2px;font-weight:700}
+.row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row label{flex:1;min-width:0;font-weight:600}
+.money{position:relative;width:46%;max-width:180px}
+.money input{width:100%;font:600 1.1rem var(--body);font-variant-numeric:tabular-nums;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px 10px 30px;text-align:left;direction:ltr;-webkit-appearance:none;appearance:none}
+.money input::placeholder{color:var(--muted);opacity:.55;font-weight:400}
+.money span{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.95rem;pointer-events:none}
+input:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:transparent}
+
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;flex:none}
+.seg input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.seg label{flex:none;display:block;background:var(--bg);color:var(--muted);font:700 1rem var(--body);padding:11px 16px;cursor:pointer;min-width:50px;text-align:center;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.seg input:checked + label{background:var(--gold);color:var(--surface)}
+.seg input:focus-visible + label{outline:2px solid var(--gold);outline-offset:-2px}
+.profit-row{flex-wrap:wrap}
+.profit-row .money{width:auto;flex:1;max-width:none}
+.hint{font-size:.85rem;color:var(--muted);padding:0 0 12px;margin:0}
+
+.status{margin:0;padding:8px 12px;border-radius:10px;font-size:.85rem;font-weight:600;background:#fde8e8;color:#8a1c1c}
+.status.ok{background:var(--gold-soft);color:var(--muted)}
+.calc{background:var(--gold);color:var(--surface);border:0;border-radius:12px;font:700 1.1rem var(--body);padding:14px;cursor:pointer;touch-action:manipulation}
+.calc:active{opacity:.85}
+.summary{background:var(--gold-soft);border-color:transparent;padding:4px 16px 14px}
+.summary h2{color:var(--fg)}
+.lines{display:flex;flex-direction:column;gap:4px;margin:6px 0 10px;font-size:.95rem}
+.lines div,.tot{display:flex;justify-content:space-between;gap:12px}
+.lines span:last-child,.tot output{font-variant-numeric:tabular-nums;direction:ltr}
+.lines .empty{color:var(--muted)}
+.tot{padding:8px 0;border-top:1px solid var(--line);font-weight:700;align-items:baseline}
+.tot output{font-size:1.15rem}
+.tot.price{border-top:2px solid var(--gold);padding-top:10px}
+.tot.price output{font-family:var(--display);font-size:2rem;color:var(--gold);font-weight:400}
+.profit-val{color:var(--good)}
+.toast{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 16px;border-radius:999px;font-weight:600;font-size:.9rem}
+@media (prefers-reduced-motion:no-preference){.price output{transition:color .2s}}
+</style>
+</head>
+<body>
+
+<div class="wrap" dir="rtl">
+  <p class="status" id="jsStatus">המחשבון לא נטען. פתח אותו מהאייקון במסך הבית או ב־Safari</p>
+  <header>
+    <h1>עלות ייצור תכשיט<small>כל השדות רשות · סכומים בש״ח</small></h1>
+    <div class="links">
+      <button class="ghost" id="sample" type="button">דוגמה</button>
+      <button class="ghost" id="reset" type="button">ניקוי</button>
+    </div>
+  </header>
+
+  <section>
+    <h2>אבנים</h2>
+    <div class="row"><label for="center">אבן מרכזית</label><div class="money"><span>₪</span><input id="center" inputmode="decimal" placeholder="0"></div></div>
+    <div class="row"><label for="side">אבני צד</label><div class="money"><span>₪</span><input id="side" inputmode="decimal" placeholder="0"></div></div>
+  </section>
+
+  <section>
+    <h2>ייצור</h2>
+    <div class="row"><label for="model">מודל תלת־ממד</label><div class="money"><span>₪</span><input id="model" inputmode="decimal" placeholder="0"></div></div>
+    <div class="row"><label for="cast">יציקת זהב</label><div class="money"><span>₪</span><input id="cast" inputmode="decimal" placeholder="0"></div></div>
+    <div class="row"><label for="smith">צורף</label><div class="money"><span>₪</span><input id="smith" inputmode="decimal" placeholder="0"></div></div>
+    <div class="row"><label for="setter">משבץ</label><div class="money"><span>₪</span><input id="setter" inputmode="decimal" placeholder="0"></div></div>
+  </section>
+
+  <section>
+    <h2>גימור ואריזה</h2>
+    <div class="row"><label for="cert">תעודה</label><div class="money"><span>₪</span><input id="cert" inputmode="decimal" placeholder="0"></div></div>
+    <div class="row"><label for="box">קופסה</label><div class="money"><span>₪</span><input id="box" inputmode="decimal" placeholder="0"></div></div>
+  </section>
+
+  <section>
+    <h2>רווח מתוכנן</h2>
+    <div class="row profit-row">
+      <div class="seg" role="radiogroup" aria-label="סוג רווח">
+        <input type="radio" name="pmode" id="modePct" value="pct" checked><label for="modePct">%</label>
+        <input type="radio" name="pmode" id="modeFix" value="fix"><label for="modeFix">₪</label>
+      </div>
+      <div class="money"><span id="profitUnit">%</span><input id="profit" inputmode="decimal" placeholder="0"></div>
+    </div>
+    <p class="hint" id="profitHint">אחוז רווח על העלות. לדוגמה 40% על עלות של 1,000 ₪ = מחיר 1,400 ₪.</p>
+  </section>
+
+  <button class="calc" id="calcBtn" type="button">חשב</button>
+
+  <section class="summary" aria-live="polite">
+    <h2>סיכום</h2>
+    <div class="lines" id="lines"><div class="empty">עוד לא הוזנו עלויות</div></div>
+    <div class="tot"><span>עלות ייצור</span><output id="oCost">₪0</output></div>
+    <div class="tot"><span>רווח <small id="oMargin"></small></span><output id="oProfit" class="profit-val">₪0</output></div>
+    <div class="tot price"><span>מחיר מכירה</span><output id="oPrice">₪0</output></div>
+  </section>
+
+  <button class="ghost" id="copy" type="button" style="align-self:flex-start">העתקת סיכום</button>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+window.onerror=function(msg,src,line){
+  var b=document.getElementById("jsStatus");
+  if(b){b.className="status bad";b.textContent="שגיאה: "+msg+" (שורה "+line+")";}
+};
+</script>
+<script>
+(function(){
+  var F=[["center","אבן מרכזית"],["side","אבני צד"],["model","מודל תלת־ממד"],["cast","יציקת זהב"],["smith","צורף"],["setter","משבץ"],["cert","תעודה"],["box","קופסה"]];
+  var mode="pct";
+  function el(id){return document.getElementById(id);}
+  function num(v){var n=parseFloat(String(v||"").replace(/,/g,"").replace(/[^\d.\-]/g,""));return isFinite(n)?n:0;}
+  function fmt(n){var r=Math.round(n*100)/100;var parts=r.toFixed(r%1?2:0).split(".");parts[0]=parts[0].replace(/\B(?=(\d{3})+(?!\d))/g,",");return "₪"+parts.join(".");}
+  function calc(){
+    var cost=0,i,html="";
+    for(i=0;i<F.length;i++){var v=num(el(F[i][0]).value);cost+=v;if(v){html+='<div><span>'+F[i][1]+'</span><span>'+fmt(v)+'</span></div>';}}
+    var p=num(el("profit").value);
+    var profit=mode==="pct"?cost*p/100:p;
+    var price=cost+profit;
+    el("oCost").textContent=fmt(cost);
+    el("oProfit").textContent=fmt(profit);
+    el("oPrice").textContent=fmt(price);
+    el("oMargin").textContent=(price>0&&profit)?"("+(profit/price*100).toFixed(1)+"% מהמחיר)":"";
+    el("lines").innerHTML=html||'<div class="empty">עוד לא הוזנו עלויות</div>';
+    save();
+    return {cost:cost,profit:profit,price:price};
+  }
+  function setMode(m){
+    mode=m;
+    el("modePct").checked=(m==="pct");
+    el("modeFix").checked=(m==="fix");
+    el("profitUnit").textContent=m==="pct"?"%":"₪";
+    el("profitHint").textContent=m==="pct"?"אחוז רווח על העלות. לדוגמה 40% על עלות של 1,000 ₪ = מחיר 1,400 ₪.":"סכום רווח קבוע שמתווסף לעלות.";
+    calc();
+  }
+  function save(){try{var d={mode:mode,profit:el("profit").value};for(var i=0;i<F.length;i++){d[F[i][0]]=el(F[i][0]).value;}localStorage.setItem("jcalc",JSON.stringify(d));}catch(e){}}
+  function load(){try{var d=JSON.parse(localStorage.getItem("jcalc")||"null");if(!d)return;for(var i=0;i<F.length;i++){el(F[i][0]).value=d[F[i][0]]||"";}el("profit").value=d.profit||"";if(d.mode)mode=d.mode;}catch(e){}}
+  var toastTimer;
+  function toast(t){var n=el("toast");n.textContent=t;n.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(function(){n.hidden=true;},1600);}
+
+  var inputs=document.querySelectorAll("input[inputmode]");
+  for(var k=0;k<inputs.length;k++){
+    inputs[k].addEventListener("input",calc);
+    inputs[k].addEventListener("change",calc);
+    inputs[k].addEventListener("keyup",calc);
+  }
+  el("modePct").addEventListener("change",function(){setMode("pct");});
+  el("modeFix").addEventListener("change",function(){setMode("fix");});
+  el("modePct").addEventListener("click",function(){setMode("pct");});
+  el("modeFix").addEventListener("click",function(){setMode("fix");});
+  el("calcBtn").addEventListener("click",function(){calc();toast("חושב");});
+  el("reset").addEventListener("click",function(){for(var i=0;i<F.length;i++){el(F[i][0]).value="";}el("profit").value="";calc();toast("נוקה");});
+  el("sample").addEventListener("click",function(){var s={center:3200,side:850,model:250,cast:1900,smith:400,setter:350,cert:150,box:40};for(var i=0;i<F.length;i++){el(F[i][0]).value=s[F[i][0]];}el("profit").value=40;setMode("pct");toast("נטענה דוגמה");});
+  el("copy").addEventListener("click",function(){
+    var r=calc(),lines=[];
+    for(var i=0;i<F.length;i++){var v=num(el(F[i][0]).value);if(v)lines.push(F[i][1]+": "+fmt(v));}
+    lines.push("—","עלות ייצור: "+fmt(r.cost),"רווח: "+fmt(r.profit),"מחיר מכירה: "+fmt(r.price));
+    try{navigator.clipboard.writeText(lines.join("\n")).then(function(){toast("הסיכום הועתק");},function(){toast("ההעתקה לא נתמכת כאן");});}catch(e){toast("ההעתקה לא נתמכת כאן");}
+  });
+  load();setMode(mode);
+  if("serviceWorker" in navigator){
+    navigator.serviceWorker.register("sw.js").then(function(){
+      var s2=el("jsStatus");s2.textContent="המחשבון פעיל · עובד גם בלי אינטרנט";
+    }).catch(function(){});
+  }
+  var st=el("jsStatus");st.className="status ok";st.textContent="המחשבון פעיל";
+})();
+</script>
+
+</body>
+</html>
