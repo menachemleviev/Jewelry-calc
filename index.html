@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="עלות תכשיט">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#f5f3ee">
+<meta name="theme-color" content="#f1f4f9">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
@@ -17,67 +17,77 @@
 html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 body{margin:0}
 [hidden]{display:none!important}
-/* Layout: single column work-sheet, cost lines grouped by stage, summary card under the profit field */
+/* Layout: single column work-sheet in white and blue, black summary card at the end */
 :root{
-  --bg:#f5f3ee; --surface:#ffffff; --fg:#23211c; --muted:#77705f; --line:#e3ddcf;
-  --gold:#94721f; --gold-soft:#f1e7cc; --good:#2f6b46;
+  --bg:#f1f4f9; --surface:#ffffff; --fg:#0b0f17; --muted:#5a6577; --line:#dce2eb;
+  --accent:#1f4fd1; --accent-soft:#e5ecfb; --on-accent:#ffffff;
+  --ink:#0b0f17; --ink-fg:#ffffff; --ink-muted:#a3aec0; --ink-line:#273041;
+  --ink-accent:#7ea4ff; --good:#4cc38a; --bad:#ff7a7a;
+  --warn-bg:#fde8e8; --warn-fg:#8a1c1c;
   --display:"Times New Roman",Georgia,serif;
   --body:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#17160f; --surface:#211f17; --fg:#efe9da; --muted:#a69d86; --line:#36322a;
-  --gold:#d8b45a; --gold-soft:#3a3120; --good:#7cc596; color-scheme:dark}}
+  --bg:#05070b; --surface:#0f141d; --fg:#f3f6fb; --muted:#93a0b4; --line:#222a37;
+  --accent:#5b8cff; --accent-soft:#132042; --on-accent:#05070b;
+  --ink:#141c2c; --ink-line:#2c3850; --warn-bg:#3a1414; --warn-fg:#ffb4b4; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#17160f; --surface:#211f17; --fg:#efe9da; --muted:#a69d86; --line:#36322a;
-  --gold:#d8b45a; --gold-soft:#3a3120; --good:#7cc596; color-scheme:dark}
+  --bg:#05070b; --surface:#0f141d; --fg:#f3f6fb; --muted:#93a0b4; --line:#222a37;
+  --accent:#5b8cff; --accent-soft:#132042; --on-accent:#05070b;
+  --ink:#141c2c; --ink-line:#2c3850; --warn-bg:#3a1414; --warn-fg:#ffb4b4; color-scheme:dark}
 
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.45;-webkit-text-size-adjust:100%}
 .wrap{max-width:520px;margin:0 auto;padding-inline:16px;padding-block:18px 40px;display:flex;flex-direction:column;gap:18px}
 header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
-h1{font-family:var(--display);font-weight:400;font-size:1.65rem;margin:0;line-height:1.1;text-wrap:balance}
-h1 small{display:block;font-family:var(--body);font-size:.85rem;color:var(--muted);font-weight:400;margin-top:4px}
+h1{font-family:var(--body);font-weight:800;font-size:1.55rem;letter-spacing:-.01em;margin:0;line-height:1.1;text-wrap:balance}
+h1 small{display:block;font-size:.85rem;color:var(--muted);font-weight:400;margin-top:4px;letter-spacing:0}
 .links{display:flex;gap:8px}
-.ghost{background:none;border:1px solid var(--line);color:var(--muted);font:600 .85rem var(--body);padding:7px 11px;border-radius:999px;cursor:pointer}
-.ghost:active{background:var(--gold-soft)}
+.ghost{background:var(--surface);border:1px solid var(--line);color:var(--fg);font:600 .85rem var(--body);padding:7px 12px;border-radius:999px;cursor:pointer}
+.ghost:active{background:var(--accent-soft)}
 
 section{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px 14px}
-section h2{font-size:.78rem;letter-spacing:.06em;color:var(--gold);margin:12px 0 2px;font-weight:700}
+section h2{font-size:.78rem;letter-spacing:.06em;color:var(--accent);margin:12px 0 2px;font-weight:700}
 .row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
 .row:last-child{border-bottom:0}
-.row label{flex:1;min-width:0;font-weight:600}
+.row > label{flex:1;min-width:0;font-weight:600}
 .money{position:relative;width:46%;max-width:180px}
 .money input{width:100%;font:600 1.1rem var(--body);font-variant-numeric:tabular-nums;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px 10px 30px;text-align:left;direction:ltr;-webkit-appearance:none;appearance:none}
 .money input::placeholder{color:var(--muted);opacity:.55;font-weight:400}
 .money span{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.95rem;pointer-events:none}
-input:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:transparent}
+input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
 
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;flex:none}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;flex:none;background:var(--bg)}
 .seg input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
-.seg label{flex:none;display:block;background:var(--bg);color:var(--muted);font:700 1rem var(--body);padding:11px 16px;cursor:pointer;min-width:50px;text-align:center;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-.seg input:checked + label{background:var(--gold);color:var(--surface)}
-.seg input:focus-visible + label{outline:2px solid var(--gold);outline-offset:-2px}
+.seg label{flex:1;display:block;color:var(--muted);font:700 1rem var(--body);padding:11px 16px;cursor:pointer;min-width:50px;text-align:center;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.seg input:checked + label{background:var(--accent);color:var(--on-accent)}
+.seg input:focus-visible + label{outline:2px solid var(--accent);outline-offset:-2px}
+.seg.wide{display:flex;margin:10px 0 4px}
+.seg.wide label{font-size:.95rem;padding:10px 8px}
 .profit-row{flex-wrap:wrap}
 .profit-row .money{width:auto;flex:1;max-width:none}
 .hint{font-size:.85rem;color:var(--muted);padding:0 0 12px;margin:0}
 
-.status{margin:0;padding:8px 12px;border-radius:10px;font-size:.85rem;font-weight:600;background:#fde8e8;color:#8a1c1c}
-.status.ok{background:var(--gold-soft);color:var(--muted)}
-.calc{background:var(--gold);color:var(--surface);border:0;border-radius:12px;font:700 1.1rem var(--body);padding:14px;cursor:pointer;touch-action:manipulation}
+.status{margin:0;padding:8px 12px;border-radius:10px;font-size:.85rem;font-weight:600;background:var(--warn-bg);color:var(--warn-fg)}
+.status.ok{background:var(--accent-soft);color:var(--accent)}
+.calc{background:var(--accent);color:var(--on-accent);border:0;border-radius:12px;font:700 1.1rem var(--body);padding:14px;cursor:pointer;touch-action:manipulation}
 .calc:active{opacity:.85}
-.summary{background:var(--gold-soft);border-color:transparent;padding:4px 16px 14px}
-.summary h2{color:var(--fg)}
-.lines{display:flex;flex-direction:column;gap:4px;margin:6px 0 10px;font-size:.95rem}
+.summary{background:var(--ink);color:var(--ink-fg);border-color:var(--ink-line);padding:4px 16px 14px}
+.summary h2{color:var(--ink-muted)}
+.lines{display:flex;flex-direction:column;gap:4px;margin:6px 0 10px;font-size:.95rem;color:var(--ink-muted)}
 .lines div,.tot{display:flex;justify-content:space-between;gap:12px}
 .lines span:last-child,.tot output{font-variant-numeric:tabular-nums;direction:ltr}
-.lines .empty{color:var(--muted)}
-.tot{padding:8px 0;border-top:1px solid var(--line);font-weight:700;align-items:baseline}
+.tot{padding:8px 0;border-top:1px solid var(--ink-line);font-weight:700;align-items:baseline}
+.tot small{font-weight:400;color:var(--ink-muted)}
+.tot small.sub{display:block;font-size:.8rem;margin-top:2px}
 .tot output{font-size:1.15rem}
-.tot.price{border-top:2px solid var(--gold);padding-top:10px}
-.tot.price output{font-family:var(--display);font-size:2rem;color:var(--gold);font-weight:400}
+.tot.big{border-top:2px solid var(--ink-accent);padding-top:10px}
+.tot.big output{font-size:2rem;color:var(--ink-accent);font-weight:800}
+.tot.big output.good{color:var(--good)}
+.tot.big output.bad{color:var(--bad)}
 .profit-val{color:var(--good)}
+.profit-val.bad{color:var(--bad)}
 .toast{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 16px;border-radius:999px;font-weight:600;font-size:.9rem}
-@media (prefers-reduced-motion:no-preference){.price output{transition:color .2s}}
 </style>
 </head>
 <body>
@@ -113,25 +123,37 @@ input:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:transp
   </section>
 
   <section>
-    <h2>רווח מתוכנן</h2>
-    <div class="row profit-row">
-      <div class="seg" role="radiogroup" aria-label="סוג רווח">
-        <input type="radio" name="pmode" id="modePct" value="pct" checked><label for="modePct">%</label>
-        <input type="radio" name="pmode" id="modeFix" value="fix"><label for="modeFix">₪</label>
-      </div>
-      <div class="money"><span id="profitUnit">%</span><input id="profit" inputmode="decimal" placeholder="0"></div>
+    <h2>מחיר ורווח</h2>
+    <div class="seg wide" role="radiogroup" aria-label="אופן החישוב">
+      <input type="radio" name="kind" id="kindPlan" value="plan" checked><label for="kindPlan">תכנון מחיר</label>
+      <input type="radio" name="kind" id="kindSold" value="sold"><label for="kindSold">כבר מכרתי</label>
     </div>
-    <p class="hint" id="profitHint">אחוז רווח על העלות. לדוגמה 40% על עלות של 1,000 ₪ = מחיר 1,400 ₪.</p>
+
+    <div id="planBox">
+      <div class="row profit-row">
+        <div class="seg" role="radiogroup" aria-label="סוג רווח">
+          <input type="radio" name="pmode" id="modePct" value="pct" checked><label for="modePct">%</label>
+          <input type="radio" name="pmode" id="modeFix" value="fix"><label for="modeFix">₪</label>
+        </div>
+        <div class="money"><span id="profitUnit">%</span><input id="profit" inputmode="decimal" placeholder="0"></div>
+      </div>
+      <p class="hint" id="profitHint">אחוז רווח על העלות. לדוגמה 40% על עלות של 1,000 ₪ = מחיר 1,400 ₪.</p>
+    </div>
+
+    <div id="soldBox" hidden>
+      <div class="row"><label for="sold">מכרתי ב־</label><div class="money"><span>₪</span><input id="sold" inputmode="decimal" placeholder="0"></div></div>
+      <p class="hint">הכנס את הסכום שהלקוח שילם, ותקבל כמה הרווחת.</p>
+    </div>
   </section>
 
   <button class="calc" id="calcBtn" type="button">חשב</button>
 
   <section class="summary" aria-live="polite">
     <h2>סיכום</h2>
-    <div class="lines" id="lines"><div class="empty">עוד לא הוזנו עלויות</div></div>
+    <div class="lines" id="lines"><div>עוד לא הוזנו עלויות</div></div>
     <div class="tot"><span>עלות ייצור</span><output id="oCost">₪0</output></div>
-    <div class="tot"><span>רווח <small id="oMargin"></small></span><output id="oProfit" class="profit-val">₪0</output></div>
-    <div class="tot price"><span>מחיר מכירה</span><output id="oPrice">₪0</output></div>
+    <div class="tot" id="rowA"><span id="labA">רווח <small id="oMargin"></small></span><output id="oA" class="profit-val">₪0</output></div>
+    <div class="tot big"><span id="labB">מחיר מכירה</span><output id="oB">₪0</output></div>
   </section>
 
   <button class="ghost" id="copy" type="button" style="align-self:flex-start">העתקת סיכום</button>
@@ -148,23 +170,36 @@ window.onerror=function(msg,src,line){
 <script>
 (function(){
   var F=[["center","אבן מרכזית"],["side","אבני צד"],["model","מודל תלת־ממד"],["cast","יציקת זהב"],["smith","צורף"],["setter","משבץ"],["cert","תעודה"],["box","קופסה"]];
-  var mode="pct";
+  var mode="pct", kind="plan", last={};
   function el(id){return document.getElementById(id);}
   function num(v){var n=parseFloat(String(v||"").replace(/,/g,"").replace(/[^\d.\-]/g,""));return isFinite(n)?n:0;}
-  function fmt(n){var r=Math.round(n*100)/100;var parts=r.toFixed(r%1?2:0).split(".");parts[0]=parts[0].replace(/\B(?=(\d{3})+(?!\d))/g,",");return "₪"+parts.join(".");}
+  function fmt(n){var neg=n<0;n=Math.abs(n);var r=Math.round(n*100)/100;var parts=r.toFixed(r%1?2:0).split(".");parts[0]=parts[0].replace(/\B(?=(\d{3})+(?!\d))/g,",");return (neg?"-":"")+"₪"+parts.join(".");}
+  function pct(a,b){return b?(a/b*100).toFixed(1)+"%":"";}
   function calc(){
     var cost=0,i,html="";
     for(i=0;i<F.length;i++){var v=num(el(F[i][0]).value);cost+=v;if(v){html+='<div><span>'+F[i][1]+'</span><span>'+fmt(v)+'</span></div>';}}
-    var p=num(el("profit").value);
-    var profit=mode==="pct"?cost*p/100:p;
-    var price=cost+profit;
+    el("lines").innerHTML=html||'<div>עוד לא הוזנו עלויות</div>';
     el("oCost").textContent=fmt(cost);
-    el("oProfit").textContent=fmt(profit);
-    el("oPrice").textContent=fmt(price);
-    el("oMargin").textContent=(price>0&&profit)?"("+(profit/price*100).toFixed(1)+"% מהמחיר)":"";
-    el("lines").innerHTML=html||'<div class="empty">עוד לא הוזנו עלויות</div>';
+    var oA=el("oA"),oB=el("oB");
+    if(kind==="plan"){
+      var p=num(el("profit").value);
+      var profit=mode==="pct"?cost*p/100:p, price=cost+profit;
+      el("labA").innerHTML='רווח <small>'+((price>0&&profit)?"("+pct(profit,price)+" מהמחיר)":"")+'</small>';
+      oA.textContent=fmt(profit); oA.className="profit-val"+(profit<0?" bad":"");
+      el("labB").textContent="מחיר מכירה";
+      oB.textContent=fmt(price); oB.className="";
+      last={cost:cost,profit:profit,price:price};
+    }else{
+      var sold=num(el("sold").value), gain=sold-cost;
+      el("labA").textContent="מחיר שקיבלתי";
+      oA.textContent=fmt(sold); oA.className="";
+      var info=sold?(gain>=0?"רווחתי":"הפסדתי")+'<small class="sub">'+pct(gain,sold)+' מהמחיר'+(cost?'<br>'+pct(gain,cost)+' על העלות':'')+'</small>':"רווח";
+      el("labB").innerHTML=info;
+      oB.textContent=fmt(gain); oB.className=sold?(gain>=0?"good":"bad"):"";
+      last={cost:cost,profit:gain,price:sold};
+    }
     save();
-    return {cost:cost,profit:profit,price:price};
+    return last;
   }
   function setMode(m){
     mode=m;
@@ -174,10 +209,19 @@ window.onerror=function(msg,src,line){
     el("profitHint").textContent=m==="pct"?"אחוז רווח על העלות. לדוגמה 40% על עלות של 1,000 ₪ = מחיר 1,400 ₪.":"סכום רווח קבוע שמתווסף לעלות.";
     calc();
   }
-  function save(){try{var d={mode:mode,profit:el("profit").value};for(var i=0;i<F.length;i++){d[F[i][0]]=el(F[i][0]).value;}localStorage.setItem("jcalc",JSON.stringify(d));}catch(e){}}
-  function load(){try{var d=JSON.parse(localStorage.getItem("jcalc")||"null");if(!d)return;for(var i=0;i<F.length;i++){el(F[i][0]).value=d[F[i][0]]||"";}el("profit").value=d.profit||"";if(d.mode)mode=d.mode;}catch(e){}}
+  function setKind(k){
+    kind=k;
+    el("kindPlan").checked=(k==="plan");
+    el("kindSold").checked=(k==="sold");
+    el("planBox").hidden=(k!=="plan");
+    el("soldBox").hidden=(k!=="sold");
+    calc();
+  }
+  function save(){try{var d={mode:mode,kind:kind,profit:el("profit").value,sold:el("sold").value};for(var i=0;i<F.length;i++){d[F[i][0]]=el(F[i][0]).value;}localStorage.setItem("jcalc",JSON.stringify(d));}catch(e){}}
+  function load(){try{var d=JSON.parse(localStorage.getItem("jcalc")||"null");if(!d)return;for(var i=0;i<F.length;i++){el(F[i][0]).value=d[F[i][0]]||"";}el("profit").value=d.profit||"";el("sold").value=d.sold||"";if(d.mode)mode=d.mode;if(d.kind)kind=d.kind;}catch(e){}}
   var toastTimer;
   function toast(t){var n=el("toast");n.textContent=t;n.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(function(){n.hidden=true;},1600);}
+  function on(id,f){el(id).addEventListener("change",f);el(id).addEventListener("click",f);}
 
   var inputs=document.querySelectorAll("input[inputmode]");
   for(var k=0;k<inputs.length;k++){
@@ -185,26 +229,26 @@ window.onerror=function(msg,src,line){
     inputs[k].addEventListener("change",calc);
     inputs[k].addEventListener("keyup",calc);
   }
-  el("modePct").addEventListener("change",function(){setMode("pct");});
-  el("modeFix").addEventListener("change",function(){setMode("fix");});
-  el("modePct").addEventListener("click",function(){setMode("pct");});
-  el("modeFix").addEventListener("click",function(){setMode("fix");});
+  on("modePct",function(){setMode("pct");});
+  on("modeFix",function(){setMode("fix");});
+  on("kindPlan",function(){setKind("plan");});
+  on("kindSold",function(){setKind("sold");});
   el("calcBtn").addEventListener("click",function(){calc();toast("חושב");});
-  el("reset").addEventListener("click",function(){for(var i=0;i<F.length;i++){el(F[i][0]).value="";}el("profit").value="";calc();toast("נוקה");});
-  el("sample").addEventListener("click",function(){var s={center:3200,side:850,model:250,cast:1900,smith:400,setter:350,cert:150,box:40};for(var i=0;i<F.length;i++){el(F[i][0]).value=s[F[i][0]];}el("profit").value=40;setMode("pct");toast("נטענה דוגמה");});
+  el("reset").addEventListener("click",function(){for(var i=0;i<F.length;i++){el(F[i][0]).value="";}el("profit").value="";el("sold").value="";calc();toast("נוקה");});
+  el("sample").addEventListener("click",function(){var s={center:3200,side:850,model:250,cast:1900,smith:400,setter:350,cert:150,box:40};for(var i=0;i<F.length;i++){el(F[i][0]).value=s[F[i][0]];}el("profit").value=40;el("sold").value=9500;setMode("pct");toast("נטענה דוגמה");});
   el("copy").addEventListener("click",function(){
     var r=calc(),lines=[];
     for(var i=0;i<F.length;i++){var v=num(el(F[i][0]).value);if(v)lines.push(F[i][1]+": "+fmt(v));}
-    lines.push("—","עלות ייצור: "+fmt(r.cost),"רווח: "+fmt(r.profit),"מחיר מכירה: "+fmt(r.price));
+    lines.push("—","עלות ייצור: "+fmt(r.cost));
+    if(kind==="plan"){lines.push("רווח: "+fmt(r.profit),"מחיר מכירה: "+fmt(r.price));}
+    else{lines.push("מחיר שקיבלתי: "+fmt(r.price),(r.profit>=0?"רווח: ":"הפסד: ")+fmt(r.profit));}
     try{navigator.clipboard.writeText(lines.join("\n")).then(function(){toast("הסיכום הועתק");},function(){toast("ההעתקה לא נתמכת כאן");});}catch(e){toast("ההעתקה לא נתמכת כאן");}
   });
-  load();setMode(mode);
-  if("serviceWorker" in navigator){
-    navigator.serviceWorker.register("sw.js").then(function(){
-      var s2=el("jsStatus");s2.textContent="המחשבון פעיל · עובד גם בלי אינטרנט";
-    }).catch(function(){});
-  }
+  load();setMode(mode);setKind(kind);
   var st=el("jsStatus");st.className="status ok";st.textContent="המחשבון פעיל";
+  if("serviceWorker" in navigator){
+    navigator.serviceWorker.register("sw.js").then(function(){st.textContent="המחשבון פעיל · עובד גם בלי אינטרנט";}).catch(function(){});
+  }
 })();
 </script>
 
